@@ -1,0 +1,106 @@
+{
+    "book flight": [
+        "i want to book a flight",
+        "Book me a flight",
+        "can you book me a flight",
+        "book me a flight please",
+        "i need a flight",
+        "hello, i need a flight",
+        "get me a flight",
+        "i need a ticket",
+        "i need to book a flight asap",
+        "set me up with a plane ticket",
+        "I want to book my flight"
+    ],
+
+    "cancel flight": [
+        "Cancel my flight",
+        "I want my flight cancelled",
+        "remove my flight",
+        "Cancel my flights",
+        "i don't want to go to that country anymore",
+        "can you cancel my flight",
+        "I am no longer going please cancel my flight",
+        "i want a refund for my ticket"
+
+    ],
+
+    "cancel booking": [
+        "cancel",
+        "call off",
+        "postpone",
+        "scrap that",
+        "let's drop the process",
+        "scrub that",
+        "abandon the process",
+        "revoke everything",
+        "write that off",
+        "repeal",
+        "forget about it"
+    ],
+
+    "yes": [
+        "yes let's do it",
+        "that's for sure",
+        "for sure",
+        "absolutely",
+        "i suppose so",
+        "i guess so",
+        "yes that is correct",
+        "let's give it a try",
+        "please do",
+        "yeah correct"
+    ],
+    "no": [
+        "i don't think so",
+        "no",
+        "nope",
+        "nah",
+        "no way",
+        "let's hold off on that for now",
+        "we can come back to this later",
+        "let's revisit this later",
+        "bad idea",
+        "bad call",
+        "no not correct",
+        "that's wrong",
+        "no the date  is wrong actually",
+        "incorrect my destination is America",
+        "no you got my date and destination wrong"
+    ],
+    "provide origin or destination or date" :[
+        "i am leaving on the 6th January",
+        "I am leaving from Guyana",
+        "I am going to Peru",
+        "I want to go to Barbados",
+        "I have to be in Trinidad on the 24ht May",
+        "I want to leave on the 30th May",
+        "I am going to Guyana from the US and will be leaving on the 1st May",
+        "Egypt is where i'm going",
+        "Want to leave before the 18th May",
+        "Will be going to Guyana from Jamaica"
+
+    ] ,
+
+    "one" :[
+        "one",
+        "1",
+        "The first ",
+        "Number one"
+
+    ],
+    "two" :[
+        "two",
+        "2",
+        "The second ",
+        "Number two"
+
+    ],
+    "three" :[
+        "three",
+        "3",
+        "The third",
+        "Number three"
+
+    ]
+}
