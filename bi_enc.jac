@@ -26,7 +26,7 @@ node bi_enc {
     }
 }
 
-walker train {
+walker bi_train {
     has train_file;
     has num_train_epochs = 50, from_scratch = true;
     root {
@@ -36,7 +36,7 @@ walker train {
     bi_enc: here::train;
 }
 
-walker infer {
+walker bi_infer {
     has query, interactive = true;
     has labels, prediction;
     root {
@@ -57,13 +57,13 @@ walker infer {
     }
 }
 
-walker save_model {
+walker bi_save_model {
     has model_path;
     can bi_enc.save_model;
     bi_enc.save_model(model_path);
 }
 
-walker load_model {
+walker bi_load_model {
     has model_path;
     can bi_enc.load_model;
     bi_enc.load_model(model_path);

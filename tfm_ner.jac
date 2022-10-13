@@ -20,7 +20,7 @@ node tfm_ner {
     }
 }
 
-walker train {
+walker tfm_train {
     has train_file;
     has num_train_epochs = 50, from_scratch = true;
     root {
@@ -30,7 +30,7 @@ walker train {
     tfm_ner: here::train;
 }
 
-walker infer {
+walker tfm_infer {
     has query, interactive = true;
     has labels, prediction;
     root {
@@ -51,13 +51,13 @@ walker infer {
     }
 }
 
-walker save_model {
+walker tfm_save_model {
     has model_path;
     can tfm_ner.save_model;
     tfm_ner.save_model(model_path=model_path);
 }
 
-walker load_model {
+walker tfm_load_model {
     has model_path;
     can tfm_ner.load_model;
     tfm_ner.load_model(model_path=model_path);

@@ -9,3 +9,18 @@ class flights(models.Model):
     dateleaving = models.DateField()
     TimeArriving = models.TimeField()
     TimeLeaving = models.TimeField()
+
+
+class vouchers(models.Model):
+    voucherNumber = models.CharField(max_length=10,default="VA124")
+    reduction = models.IntegerField()
+
+
+class BookedFlights(models.Model):
+    UserID = models.IntegerField(null=False)
+    flightName = models.CharField(null=False,max_length=30)
+    FlightID = models.IntegerField(null=False)
+    Class = models.CharField(max_length=30)
+    status = models.BooleanField()
+     
+

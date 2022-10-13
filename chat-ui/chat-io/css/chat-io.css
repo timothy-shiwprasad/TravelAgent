@@ -1,0 +1,421 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+  background: rgb(94, 94, 94);
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.chatio__overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: block;
+    background-color: #0000000f;
+    background-repeat: repeat;
+    z-index: 1;
+}
+
+/* -------------------------------------------------------------------
+ * ## style placeholder text - (_forms.scss)
+ * ------------------------------------------------------------------- */
+
+::-webkit-input-placeholder {
+    color: #dddddd;
+}
+
+:-moz-placeholder {
+    color: #dddddd;
+    /* Firefox 18- */
+}
+
+::-moz-placeholder {
+    color: #dddddd;
+    /* Firefox 19+ */
+}
+
+:-ms-input-placeholder {
+    color: #dddddd;
+}
+
+.placeholder {
+    color: #dddddd !important;
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#chatio__input {
+    position: relative;
+    font-family: "montserrat-regular", sans-serif;
+    transition: all .5s ease-out;
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    margin-top: 0;
+    width: 400px;
+    max-width: 85vw;
+    max-height:100vh;
+    /* background: #00000085; */
+    padding: 20px;
+}
+
+#chatio__input .dark-bg {
+  color: #fff;
+}
+
+#chatio__input .__header,
+#chatio__input .__body,
+#chatio__input .__footer
+ {
+  position: relative;
+}
+
+#chatio__input .__footer {
+  border-bottom: 2px solid rgb(255 250 250);
+}
+
+#chatio__dialog {
+  padding: 15px 5px;
+  height: 370px;
+  overflow-x: hidden;
+	overflow-y: auto;
+	width: 100%;
+	position: relative;
+}
+
+#chatio__dialog .chat-messages-list {
+	list-style-type: none;
+	padding: 0 5px 0 0;
+	margin: 0;
+	width: 100%;
+}
+
+#chatio__dialog .chat-message {
+	position: relative;
+	font-size: 0;
+	margin-bottom: 10px;
+}
+
+#chatio__dialog .chat-message-effect {
+	position: absolute;
+}
+
+#chatio__dialog .chat-message-bubble {
+	display: inline-block;
+	font-size: 14px;
+	max-width: 350px;
+	background: #fff;
+	padding: 8px 14px;
+	border-radius: 18px;
+	min-width: 0;
+}
+
+#chatio__dialog .chat-message-self.chat-message-merge-start .chat-message-bubble {
+	border-bottom-right-radius: 0;
+}
+
+#chatio__dialog .chat-message-self.chat-message-merge-middle .chat-message-bubble {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+#chatio__dialog .chat-message-self.chat-message-merge-end .chat-message-bubble {
+	border-top-right-radius: 0;
+}
+
+#chatio__dialog .chat-message-self {
+	text-align: right;
+}
+
+#chatio__dialog .chat-message-self .chat-message-bubble,
+#chatio__dialog .chat-message-effect .chat-message-bubble {
+	background: #9b9da9;
+	color: #fff;
+	text-align: left;
+}
+
+#chatio__input .chat-loader-container {
+	position: absolute;
+	top: -15px;
+	width: 100%;
+}
+
+#chatio__input .chat-loader-bar {
+	/* background: #32a8e6; */
+	position: absolute;
+	width: 100%;
+	height: 40px;
+	-webkit-transform: rotateY(0);
+	transform: rotateY(0);
+}
+
+#chatio__input .chat-effect-dots {
+	position: absolute;
+}
+
+#chatio__input .chat-effect-dot {
+	background: #dedede;
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	border-radius: 100%;
+}
+
+#chatio__input .chat-info-container {
+	position: absolute;
+  top:-27px;
+	font-size: 12px;
+	color: #dedede;
+}
+
+#chatio__input .chat-info-typing {
+	position: relative;
+	left: 80px;
+	white-space: nowrap;
+}
+
+#chatio__input button {
+    background-color: transparent;
+    border: none;
+}
+
+#chatio__input button:focus {
+    outline: 1px dotted;
+}
+
+#chatio__input input.dark-bg {
+    /*color: #fff !important;*/
+    border-color: #c3c3c3;
+}
+
+#chatio__input input.dark-bg:focus {
+    border-color: #fff;
+}
+
+#chatio__input input[type="text"] {
+    display: block;
+    height: 4rem;
+    padding: 0 0 0 50px;
+    border: 0;
+    outline: none;
+    color: #ffffff !important;
+    font-family: "montserrat-regular", sans-serif;
+    font-size: 1.2rem;
+    line-height: 3rem;
+    max-width: 100%;
+    background: transparent !important;
+    transition: all 0.3s ease-in-out;
+    width: 300px;
+}
+
+#chatio__input input {
+    font-family: sans-serif;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
+
+#chatio__input input:-webkit-autofill,
+#chatio__input input:-webkit-autofill:hover,
+#chatio__input input:-webkit-autofill:focus
+#chatio__input input:-webkit-autofill,
+#chatio__input input:-internal-autofill-selected{
+    -webkit-text-fill-color: #cf3e3e;
+    transition: background-color 5000s ease-in-out 0s;
+    background-color: transparent !important;
+    background: none !important;
+}
+
+#chatio__input input[type="text"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+}
+
+
+#chatio__input .btn {
+    border-color: #fff;
+    color: #fff;
+    border-radius: 0;
+    outline: 1px solid;
+    margin-left: 3px;
+    padding: 5px 10px;
+}
+
+#chatio__input.collapsed {
+    opacity: 0;
+    margin-top: 50px;
+    visibility:hidden;
+}
+
+#chatio__submit {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  right: 0;
+  top: 15px;
+}
+
+#chatio__menuToggle {
+    position: absolute;
+    left: -8px;
+    top: 10px;
+    height: 42px;
+    width: 42px;
+    line-height: 42px;
+    font-family: "montserrat-regular", sans-serif;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: .2rem;
+    color: rgba(255, 255, 255, 0.5);
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+#chatio__menuToggle:hover, #chatio__menuToggle:focus {
+    color: #FFFFFF;
+}
+
+#chatio__menuToggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin-top: -1px;
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    background-color: white;
+    -webkit-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+}
+
+#chatio__menuToggle span::before,
+#chatio__menuToggle span::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    position: absolute;
+    left: 0;
+    -webkit-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+
+#chatio__menuToggle span::before {
+    top: -9px;
+}
+
+#chatio__menuToggle span::after {
+    bottom: -9px;
+}
+
+#chatio__menu {
+    position: absolute;
+    bottom: 5em;
+    left: 0;
+    z-index: 3;
+    width: 340px;
+    margin-top: 0;
+    height: 200px;
+    transition: all 0.5s ease-in-out;
+    overflow: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    background-color: #272727c2;
+    padding: 8px 14px;
+    border-radius: 10px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+#chatio__menu::-webkit-scrollbar {
+    display: none;
+}
+
+#chatio__menu.collapsed {
+    opacity: 0;
+    bottom: 0;
+    visibility:hidden;
+}
+
+#chatio__menu ul {
+    list-style-type: none;
+}
+
+#chatio__menu ul > li {
+    margin: 15px 0;
+}
+
+#chatio__menu ul > li a{
+    border: 0.1rem solid #ffffff;
+    padding: 5px 10px;
+    color: #fff;
+}
+
+video::cue {
+    font-size: 50%;
+}
+
+video::-webkit-media-text-track-display {
+
+}
+
+
+video::-webkit-media-text-track-container {
+}
