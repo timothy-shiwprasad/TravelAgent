@@ -1,7 +1,7 @@
   
 walker talk {
     has question = false ;
-    has interactive = false;
+    has interactive = true;
     has wlk_ctx = {
         "respond" : false ,
         "prev_state" :null ,
