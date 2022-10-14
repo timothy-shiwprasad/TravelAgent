@@ -44,12 +44,12 @@ var chatLoaderContainer = document.querySelector('.chat-loader-container');
 var chatInfoContainer = document.querySelector('.chat-info-container');
 var ischatThinking = false;
 
-function walker_run(name, utterance="", nd = null) {
+function walker_run(name, question="", nd = null) {
 
   query = `
   {
     "name": "${name}",
-    "ctx": {"utterance": "${utterance}"},
+    "ctx": {"question": "${question}"},
     "snt": "${sentinel_id}",
     "detailed":"false"
   }
@@ -60,7 +60,7 @@ function walker_run(name, utterance="", nd = null) {
     {
       "name": "${name}",
       "nd" : "${nd}",
-      "ctx": {"utterance": "${utterance}"},
+      "ctx": {"question": "${question}"},
       "snt": "${sentinel_id}",
       "detailed":"false"
     }
@@ -212,14 +212,14 @@ function interact(event) {
 
   if(event) event.preventDefault();
 
-  let utterance = inputField.value;
-  if (utterance.trim()) {
+  let question = inputField.value;
+  if (question.trim()) {
     inputField.value = "";
-    addMessage(utterance,true);
+    addMessage(question,true);
 
     chatIsThinking();
 
-    walker_run(walker, utterance, last_jid).then((result) => {
+    walker_run(walker, question, last_jid).then((result) => {
 
       if(result.report[0]) {
 
@@ -229,7 +229,7 @@ function interact(event) {
         } else last_jid = null;
 
         //show the response message in the chat
-        addMessage(result.report[0].message);
+        addMessage(result.report[0]);
       } else last_jid = null;
 
       chatStoppedThinking(); 

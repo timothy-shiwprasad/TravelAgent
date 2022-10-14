@@ -2,6 +2,8 @@ import {*} with './nodes.jac';
 import {*} with './graphs.jac';
 import {*} with './edges.jac';
 import {*} with './walkers.jac';
+import {*} with './bi_enc.jac';
+import {*} with './tfm_ner.jac';
 
 
 walker init {

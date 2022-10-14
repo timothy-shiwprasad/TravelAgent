@@ -13,22 +13,25 @@ def getFlight(request,format = None):
     if request.method == "GET":
         data = request.data
         matchedFlights = flights.objects.filter(Departing=data["origin"],arriving=data["destination"],dateleaving=data["date"])
-        print(matchedFlights)
-        jsonresponse = {}
-        jsonresponse["flights"] = []
-        for flight in matchedFlights:
-            jsonFlight = {
-                "ID": flight.id,
-                "Flight" : flight.flightName,
-                "Departing" : flight.Departing,
-                "Destination" : flight.arriving,
-                "DateArriving" : flight.DateArriving,
-                "DateDeparting" : flight.dateleaving,
-                "TimeArriving" : flight.TimeArriving,
-                "TimeLeaving" : flight.TimeLeaving
-            }
+        if(len(matchedFlights)> 0):
+            jsonresponse = {}
+            jsonresponse["flights"] = []
+            for flight in matchedFlights:
+                jsonFlight = {
+                    "ID": flight.id,
+                    "Flight" : flight.flightName,
+                    "Departing" : flight.Departing,
+                    "Destination" : flight.arriving,
+                    "DateArriving" : flight.DateArriving,
+                    "DateDeparting" : flight.dateleaving,
+                    "TimeArriving" : flight.TimeArriving,
+                    "TimeLeaving" : flight.TimeLeaving
+                }
 
-            jsonresponse["flights"].append(jsonFlight)
+                jsonresponse["flights"].append(jsonFlight)
+        else:
+            jsonresponse = {}
+            jsonresponse["flights"] = None
 
         return JsonResponse(jsonresponse)
              

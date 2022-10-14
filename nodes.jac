@@ -4,7 +4,6 @@ node dialogue_state {
 
     can classify_intent {
         intent_labels = -[intent_transition]->.edge.intent;
-        std.out(intent_labels);
         visitor.wlk_ctx["intent"] = bi_enc.infer(
             contexts = [visitor.question],
             candidates = intent_labels ,
@@ -62,7 +61,7 @@ node dialogue_root:dialogue_state {
         
     }
     can process {
-        std.out(visitor.wlk_ctx["intent"]);
+        
         visitor.wlk_ctx["prev_state"] = here ;
         visitor.wlk_ctx["next_state"] = (-[intent_transition(intent==visitor.wlk_ctx["intent"])]->)[0];
     }
@@ -81,28 +80,27 @@ node nd_bookFlight:dialogue_state {
     }
 
     can process {
-        std.out("process");
+        
           // Check entity transition
         required_entities = -[entity_transition]->.edge[0].context["entities"];
-        #std.out(required_entities);
-        #std.out(visitor.wlk_ctx["entities"].d::keys);
+    
         if (vector.sort_by_key(visitor.wlk_ctx["entities"].d::keys) == vector.sort_by_key(required_entities)) {
             visitor.wlk_ctx["next_state"] = -[entity_transition]->[0];
             visitor.wlk_ctx["prev_state"] = here;
-            std.out("1");
+         
         } elif (visitor.wlk_ctx["prev_state"] and !visitor.wlk_ctx["prev_state"].context["name"] in ["book_flight", "book_flight_confirmation"]){
-            std.out("2");
+        
             next_state = -[intent_transition(intent==visitor.wlk_ctx["intent"])]->;
             if (next_state.length > 0 and visitor.wlk_ctx["intent"] != "no") {
                 visitor.wlk_ctx["next_state"] = next_state[0];
                 visitor.wlk_ctx["prev_state"] = here;
-                std.out("2a");
+                
             } else {
                 visitor.wlk_ctx["respond"] = true;
-                std.out("2b");
+           
             }
         }    else {
-            std.out("3");
+           
             visitor.wlk_ctx["respond"] = true;
         }
 
@@ -160,6 +158,22 @@ node nd_book_flight_confirmed:dialogue_state {
         visitor.response = "Your Flight has been booked";       
     }
 
+    can process {
+        if(visitor.wlk_ctx["prev_state"]): visitor.wlk_ctx["respond"] = true;
+
+
+        else:{
+            visitor.wlk_ctx["next_state"] = net.root();
+            visitor.wlk_ctx["prev_state"] = here;
+            visitor.wlk_ctx["intent"] = null ;
+            visitor.wlk_ctx["entities"] = {} ;
+            visitor.wlk_ctx["respond"] = false;
+            visitor.wlk_ctx["voucher_number"] = null ;
+          }
+    }
+
+
+
     can nlg {
 
         ## API call to backend to get flights 
@@ -169,6 +183,8 @@ node nd_book_flight_confirmed:dialogue_state {
 
 node nd_selectflight:dialogue_state{
     has name = "selectFlight" ;
+    has count = 1 ;
+    has textToAppend = "";
 
 
     can generateFlights{
@@ -184,7 +200,15 @@ node nd_selectflight:dialogue_state{
     "date" : "2022-09-01"
     },
     null);
-    visitor.wlk_ctx["flights"] = response["response"]["flights"];
+    if( response["response"]["flights"]):{
+         visitor.wlk_ctx["flights"] = response["response"]["flights"];
+
+    }
+
+    else : {
+        visitor.wlk_ctx["flights"] = "There are no flights";
+    }
+   
 
     # will edit when ui is connected
 
@@ -251,7 +275,17 @@ node nd_selectflight:dialogue_state{
         
         if(visitor.wlk_ctx["prev_state"] != null):{
             if(visitor.wlk_ctx["prev_state"].name == "book_flight_confirmation"):{
-                visitor.response = "Please select flight\n " + visitor.wlk_ctx["flights"].str ;
+                visitor.response = "Please select flight:\n";
+                for flight in visitor.wlk_ctx["flights"]:{
+
+                    textToAppend = count.str + " ) " + flight["Flight"] + ", Leaving: " + flight["Departing"] + " on the " + flight["DateDeparting"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["Destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
+                    count = count +1 ;
+
+                    visitor.response = visitor.response + textToAppend ;
+                    textToAppend = "";
+
+                }
+               
             }
             
         }
@@ -260,7 +294,16 @@ node nd_selectflight:dialogue_state{
             visitor.response = "The flight you want to book is as follows: Flight Name: " + visitor.flight["Flight"] + ", Leaving: " + visitor.flight["Departing"] + " on the " + visitor.flight["DateDeparting"] + " at " + visitor.flight["TimeLeaving"]+ " and arriving in " + visitor.flight["Destination"] + " on the " + visitor.flight["DateArriving"] + " at " + visitor.flight["TimeArriving"] + " are you okay with this?" ;
         }
         elif(visitor.wlk_ctx["intent"] == "no"){
-            visitor.response = "Please select another flight\n " + visitor.wlk_ctx["flights"].str  ;
+            visitor.response = "Please select another flight\n" ;
+            for flight in visitor.wlk_ctx["flights"]:{
+
+                    textToAppend = count.str + " ) " + flight["Flight"] + ", Leaving: " + flight["Departing"] + " on the " + flight["DateDeparting"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["Destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
+                    count = count +1 ;
+
+                    visitor.response + textToAppend ;
+                    textToAppend = "";
+
+                }
 
         }
 
@@ -361,7 +404,7 @@ node nd_voucher:dialogue_state{
         }
         elif(!visitor.wlk_ctx["intent"]):{
                 ::classify_intent;
-                std.out(visitor.wlk_ctx["intent"]);
+                
                 
         }  
     }
@@ -410,7 +453,6 @@ node nd_voucher:dialogue_state{
 
 
         can nlg {
-            std.out("nlg");
              if(visitor.wlk_ctx["prev_state"] != null):{
                 if(visitor.wlk_ctx["prev_state"].name == "secondaryDetailsConfirmed" or visitor.wlk_ctx["prev_state"].name == "voucher"):{
                 visitor.response = "Please Enter Voucher number alone";
@@ -465,8 +507,7 @@ node nd_FlightDetails:dialogue_state{
                     flightDetails["discount"] = visitor.voucherInfo["reduction"];
                 }
 
-                visitor.response = flightDetails.str + "\n" + "Is this flight okay with you";
-                
+                visitor.response = "The flight you want to book is as follows: Flight Name: " + flightDetails["Flight"] + ", Leaving: " + flightDetails["Departing"] + " on the " + flightDetails["DateDeparting"] + " at " + flightDetails["TimeLeaving"]+ " and arriving in " + flightDetails["Destination"] + " on the " + flightDetails["DateArriving"] + " at " + flightDetails["TimeArriving"] + " and Class " + flightDetails["class"] + " are you okay with this?";
             }
 
     }
@@ -479,16 +520,23 @@ node nd_FlightDetails:dialogue_state{
 node nd_cancel_flight_co:dialogue_state {
     has name = "cancelflight";
     has flightstoCancell = null;
+    has count =1;
+    has textToAppend = "";
     can getUsersFlight {
 
-        response = request.get("http://localhost:8080/airline/userflights/",
+         response = request.get("http://localhost:8080/airline/userflights/",
         {
             "UserID" : 1
         },
         null
         );
 
-        flightstoCancell = response["response"];
+        if(response["response"]):{
+            flightstoCancell = response["response"]["flights"];
+        }
+        else:{
+            flightstoCancell = "There are no flights to Cancell";
+        }
 
     }
      can getInterger {
@@ -523,7 +571,7 @@ node nd_cancel_flight_co:dialogue_state {
         else:{
             if(visitor.wlk_ctx["intent"] in ["one", 'two',"three", "four"]):{
                 ::getInterger ;
-                visitor.flight = flightstoCancell["flights"][visitor.wlk_ctx["flight_chosen"]];
+                visitor.flight = flightstoCancell[visitor.wlk_ctx["flight_chosen"]];
                 visitor.wlk_ctx["respond"] = true ;
                 
             }
@@ -545,7 +593,16 @@ node nd_cancel_flight_co:dialogue_state {
     can nlg {
         if(visitor.wlk_ctx["prev_state"] != null):{
             if(visitor.wlk_ctx["prev_state"].name == "dialogue_root" or visitor.wlk_ctx["prev_state"].name == "cancelflight"):{
-                visitor.response = "Please select FLight to cancell: \n"   + flightstoCancell["flights"].str ;
+                visitor.response = "Please select Flight to cancell: \n"  ;
+                 for flight in flightstoCancell:{
+
+                    textToAppend = count.str + " ) " + flight["flightName"] + ", Leaving: " + flight["origin"] + " on the " + flight["DateLeaving"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
+                    count = count +1 ;
+
+                    visitor.response = visitor.response + textToAppend ;
+                    textToAppend = "";
+
+                }
             }
         }
 

@@ -21,6 +21,6 @@ class BookedFlights(models.Model):
     flightName = models.CharField(null=False,max_length=30)
     FlightID = models.IntegerField(null=False)
     Class = models.CharField(max_length=30)
-    status = models.BooleanField()
+    status = models.BooleanField(default=True)
      
 
