@@ -44,4 +44,4 @@ remove semicolon line 85 in nodes.jac
 Run : jac run main.jac
 - no change will occur if compied 
 
-follow same flow as above
+- follow same flow as above
