@@ -11,3 +11,5 @@ edge entity_transition {
 edge user_transition {
     has id;
 }
+
+edge answer;

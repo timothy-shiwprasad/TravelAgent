@@ -25,6 +25,7 @@ walker talk {
     } 
 
     dialogue_state { 
+            std.out(here.name);
             if(!question and interactive):{
             question = std.input("Input( Ctrl-C to exit)> ");
             here ::init_wlk_ctx;
@@ -51,6 +52,7 @@ walker talk {
             
             take here; 
         } else {
+            
             take visitor.wlk_ctx["next_state"] else: take here;
         }
     }

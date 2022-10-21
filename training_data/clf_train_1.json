@@ -87,21 +87,39 @@
         "one",
         "1",
         "The first ",
-        "Number one"
+        "Number one",
+        "the second one"
 
     ],
     "two" :[
         "two",
         "2",
         "The second ",
-        "Number two"
+        "Number two",
+        "the seconf one"
 
     ],
     "three" :[
         "three",
         "3",
         "The third",
-        "Number three"
+        "Number three",
+        "the fourth one"
 
+    ],
+    "four" :[
+        "four",
+        "4",
+        "the fourth",
+        "the fourth one",
+        "number four"
+    ],
+
+    "question" : [
+        "i have a question",
+        "answer this",
+        "help me out",
+        "answer this question",
+        "answer my question please"
     ]
 }

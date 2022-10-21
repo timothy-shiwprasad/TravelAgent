@@ -743,16 +743,77 @@ can nlg {
 
 //faq 
 
+node FAQRoot:dialogue_state {
+    can use.qa_classify ;
+    has name = "faqroot" ;
+    has answered = false ;
+    can nlu {
+        if(!visitor.wlk_ctx["intent"]): visitor.wlk_ctx["intent"] = visitor.question;
+    }
+
+    can process {
+        if(visitor.wlk_ctx["prev_state"] != null):{
+            if(visitor.wlk_ctx["prev_state"].name == "dialogue_root"): visitor.wlk_ctx["respond"] = true ;
+        }
+        elif(visitor.wlk_ctx["prev_state"] == null):{
+            std.out(here.answered);
+                if(!here.answered):{
+                
+                visitor.wlk_ctx["respond"] = true;
+                answers = -[answer]->.answer;
+                std.out(answers);
+                best_answer = use.qa_classify(
+                text = visitor.wlk_ctx["intent"],
+                classes = answers
+                );
+                visitor.wlk_ctx["intent"] = best_answer["match"];
+                std.out(best_answer);
+                here.answered = true;
+                }
+
+                else:{
+                    std.out(answered);
+                    here.answered = false ;
+                    visitor.wlk_ctx["next_state"] = -[intent_transition(intent="yes")]->[0] ;
+                    visitor.wlk_ctx["prev_state"] = here ;
+                }
+                
+}
+        
+        }
+
+    can nlg {
+         if(visitor.wlk_ctx["prev_state"] != null):{
+            if(visitor.wlk_ctx["prev_state"].name == "dialogue_root"): visitor.response = "Ask your question" ;
+        
+        }
+        else:{
+            visitor.response = visitor.wlk_ctx["intent"];
+        }
+
+    }
+}
+
+node FAQState {
+    has answer;
+
+}
+
+
+
 
 // account nodes 
 /*
 node accountState{
 
 can nlu {
-    user_Id = -[user_transition]->.edge.id;
-    if(visitor.question in user_Id):{
-        visitor.wlk_ctx["userID"] = visitor.question ;
+    if(!visitor.wlk_ctx["intent"]):{
+        user_Id = -[user_transition]->.edge.id;
+        if(visitor.question in user_Id):{
+        visitor.account = -[user_transition(id=visitor.question)]->[0];
     }
+    }
+    
 }
 
     can process {
@@ -786,7 +847,7 @@ node user {
     has password;
 }
 
-
+/*
         response = "Please Enter User Id";
          if(interactive): std.out(response);
            else:{

@@ -34,8 +34,23 @@
         dialogue_root -[intent_transition(intent="cancel Flight")]-> cancel_flight;
         cancel_flight -[intent_transition(intent="no")] -> cancel_flight;
         cancel_flight -[intent_transition(intent="yes")] -> cancel_flight_confirm ;
+        //faq
+        FAQState = spawn node::FAQRoot;
+        faq1 = spawn node::FAQState(answer="The cheapest flight is to Trinidad");
+        faq2 = spawn node::FAQState(answer="The most expensive flight is to London");
+        faq3 = spawn node::FAQState(answer="To book a flight just ask , i want to book a flight");
+
+       
+        dialogue_root -[intent_transition(intent="no")] ->FAQState ;
+        FAQState -[intent_transition(intent="yes")] -> dialogue_root;
+        FAQState -[answer]-> faq1;
+        FAQState -[answer]-> faq2;
+        FAQState -[answer]-> faq3;
+
     }
 }
+
+
 
 
 /*
