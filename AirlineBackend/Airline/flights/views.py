@@ -86,6 +86,7 @@ def usersFlight(request,format=None):
             
             for singleflights in userFlights:
                 fly = flights.objects.get(id=singleflights.FlightID)
+                Sflight["BookedFlightId"] = singleflights.id ,
                 Sflight["flightName"] = fly.flightName
                 Sflight["origin"] = fly.Departing
                 Sflight["destination"] = fly.arriving
@@ -101,3 +102,19 @@ def usersFlight(request,format=None):
         
 
         return JsonResponse(jsonresponse)
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def CancelUserFlight(request,format=None):
+    if request.method == "POST":
+        data = request.data
+        try:
+            flight = BookedFlights.objects.get(id=data["BookedFlightID"][0])
+            flight.delete()
+            jsonresponse = {"Sucess" : True}
+        except Exception as e: 
+            print(e)
+            jsonresponse = {"Sucess" : False}
+    return JsonResponse(jsonresponse)

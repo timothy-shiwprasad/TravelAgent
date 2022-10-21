@@ -36,3 +36,21 @@
         cancel_flight -[intent_transition(intent="yes")] -> cancel_flight_confirm ;
     }
 }
+
+
+/*
+graph accounts {
+    has anchor accountState ;
+
+    spawn {
+        accountState = spawn node::accountState ;
+        user1 = spawn node::user(password="password");
+        user2 = spawn node::user(password="passwords");
+
+        accountState -[user_transition(id="1")] ->user1;
+        accountState -[user_transition(id="2")] -> user2 ;
+
+
+    }
+}
+*/

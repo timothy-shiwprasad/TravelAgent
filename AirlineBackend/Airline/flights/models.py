@@ -9,6 +9,7 @@ class flights(models.Model):
     dateleaving = models.DateField()
     TimeArriving = models.TimeField()
     TimeLeaving = models.TimeField()
+    price= models.IntegerField()
 
 
 class vouchers(models.Model):

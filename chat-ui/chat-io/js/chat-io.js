@@ -229,8 +229,18 @@ function interact(event) {
         } else last_jid = null;
 
         //show the response message in the chat
-        addMessage(result.report[0]);
-      } else last_jid = null;
+        if(Array.isArray(result.report[0])) {
+          for(let mes in result.report[0]){
+            addMessage(result.report[0][mes]) ;
+          }
+        }
+        else{
+          addMessage(result.report[0]); 
+        }
+         
+      
+      } 
+      else last_jid = null;
 
       chatStoppedThinking(); 
 
@@ -246,3 +256,6 @@ addCss(`chat-io/css/chat-io.css`);
 addJs(`chat-io/js/TweenMax.min.js`);
 //add event listener to the input field
 inputForm.addEventListener("submit", interact);
+
+addMessage("Welcome Traveler, How can i Help?  Want to book a flight or Cancel a flight or even ask a question , Don't be shy just ask !");
+

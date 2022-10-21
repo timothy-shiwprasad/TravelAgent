@@ -1,7 +1,8 @@
   
 walker talk {
+    has access = false;
     has question = false ;
-    has interactive = true;
+    has interactive = false;
     has wlk_ctx = {
         "respond" : false ,
         "prev_state" :null ,
@@ -13,12 +14,14 @@ walker talk {
 
     };
     has response;
+    has account = null;
     has flight ; 
     has voucherInfo = {
         "valid" : false
     };
     root {
-        take --> node::dialogue_root;
+            take --> node::dialogue_root;
+       
     } 
 
     dialogue_state { 
@@ -51,6 +54,7 @@ walker talk {
             take visitor.wlk_ctx["next_state"] else: take here;
         }
     }
+
 }
 
 

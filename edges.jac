@@ -6,3 +6,8 @@ edge intent_transition {
 edge entity_transition {
     has entities;
 }
+
+
+edge user_transition {
+    has id;
+}

@@ -9,6 +9,7 @@ import {*} with './tfm_ner.jac';
 walker init {
     root {
         spawn here --> graph::dialogue_system;
-        spawn here walker::talk ;
+        #spawn here --> graph::accounts;
+        #spawn here walker::talk ;
     }
 }

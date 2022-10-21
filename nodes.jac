@@ -74,9 +74,68 @@ node dialogue_root:dialogue_state {
 
 node nd_bookFlight:dialogue_state {
     has name = "book_flight";
+    has ProcessedDate = true;
     can nlu {
         if (!visitor.wlk_ctx["intent"]): ::classify_intent;
         ::extract_entities;
+    }
+
+    can convertDate {
+        count = 1 ;
+        commonMonths = ["january","february", "march","april","may","june","july","august","september","october","november","december"];
+        CapitalMonths = ["January","February", "March","April","May","June","July","August","September","October","November","December"];
+        dateString = visitor.wlk_ctx["entities"]["date"][0];
+        monthFound = false ;
+        dayFound = false;
+        here.ProcessedDate = "2022-" ;
+
+        for month in commonMonths:{
+            if(dateString.str::find(month) != -1):{
+                monthFound = true ;
+                if(count<10) : here.ProcessedDate = ProcessedDate + "0" + count.str + "-" ;
+                else : here.ProcessedDate = ProcessedDate + count.str + "-" ;
+                
+                break;
+
+            }
+            count = count + 1 ;
+        }
+
+        if(!monthFound):{
+           
+            count = 1 ;
+            for month in CapitalMonths:{
+            if(dateString.str::find(month) != -1):{
+                monthFound = true ;
+                if(count<10) : here.ProcessedDate = ProcessedDate + "0" + count.str + "-" ;
+                else : here.ProcessedDate = ProcessedDate + count.str + "-" ;
+                break;
+
+            }
+            count = count + 1 ;
+        }
+        }
+
+        // find day 
+        if(monthFound):{
+            for i = 31 to i>0 by i-=1 :{
+           
+            if(dateString.str::find(i.str) != -1):{
+                dayFound = true ;
+                if(i<10): here.ProcessedDate  = ProcessedDate + "0" + i.str ;
+                else : here.ProcessedDate =  ProcessedDate + i.str ;
+                break;
+            }
+        }
+        }
+        
+    if(!dayFound):{
+        here.ProcessedDate = false ;
+        visitor.wlk_ctx["entities"]["date"] = null ;
+    }
+
+    visitor.wlk_ctx["entities"]["date"][0] = here.ProcessedDate ;
+        
     }
 
     can process {
@@ -85,8 +144,16 @@ node nd_bookFlight:dialogue_state {
         required_entities = -[entity_transition]->.edge[0].context["entities"];
     
         if (vector.sort_by_key(visitor.wlk_ctx["entities"].d::keys) == vector.sort_by_key(required_entities)) {
-            visitor.wlk_ctx["next_state"] = -[entity_transition]->[0];
-            visitor.wlk_ctx["prev_state"] = here;
+            std.out("did this run");
+            ::convertDate ;
+            if(visitor.wlk_ctx["entities"]["date"]):{
+                    visitor.wlk_ctx["next_state"] = -[entity_transition]->[0];
+                     visitor.wlk_ctx["prev_state"] = here;
+            }
+            else:{
+                visitor.wlk_ctx["respond"] =true ;
+            }
+            
          
         } elif (visitor.wlk_ctx["prev_state"] and !visitor.wlk_ctx["prev_state"].context["name"] in ["book_flight", "book_flight_confirmation"]){
         
@@ -112,8 +179,15 @@ node nd_bookFlight:dialogue_state {
             visitor.response = "Where will you be departing?";
         elif("destination" not in visitor.wlk_ctx["entities"]):
             visitor.response = "Where will you be going";
-        elif("date" not in visitor.wlk_ctx["entities"]):
-            visitor.response = "What date do you want to leave";
+        elif("date" not in visitor.wlk_ctx["entities"]):{
+                if(ProcessedDate):{
+                    visitor.response = "What date do you want to leave";
+                }
+                else :{
+                    visitor.response = "Please Enter date Properly";
+                }
+        }
+            
         else : visitor.response = "Menno";
       
     }
@@ -185,7 +259,8 @@ node nd_selectflight:dialogue_state{
     has name = "selectFlight" ;
     has count = 1 ;
     has textToAppend = "";
-
+    has ProcessedDate = "";
+    
 
     can generateFlights{
     origin = visitor.wlk_ctx["entities"]["origin"][0];
@@ -275,13 +350,13 @@ node nd_selectflight:dialogue_state{
         
         if(visitor.wlk_ctx["prev_state"] != null):{
             if(visitor.wlk_ctx["prev_state"].name == "book_flight_confirmation"):{
-                visitor.response = "Please select flight:\n";
+                visitor.response = ["Please select Flight:"];
                 for flight in visitor.wlk_ctx["flights"]:{
 
                     textToAppend = count.str + " ) " + flight["Flight"] + ", Leaving: " + flight["Departing"] + " on the " + flight["DateDeparting"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["Destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
                     count = count +1 ;
 
-                    visitor.response = visitor.response + textToAppend ;
+                    visitor.response.l::append(textToAppend) ;
                     textToAppend = "";
 
                 }
@@ -294,13 +369,13 @@ node nd_selectflight:dialogue_state{
             visitor.response = "The flight you want to book is as follows: Flight Name: " + visitor.flight["Flight"] + ", Leaving: " + visitor.flight["Departing"] + " on the " + visitor.flight["DateDeparting"] + " at " + visitor.flight["TimeLeaving"]+ " and arriving in " + visitor.flight["Destination"] + " on the " + visitor.flight["DateArriving"] + " at " + visitor.flight["TimeArriving"] + " are you okay with this?" ;
         }
         elif(visitor.wlk_ctx["intent"] == "no"){
-            visitor.response = "Please select another flight\n" ;
+            visitor.response = ["Please select another flight"] ;
             for flight in visitor.wlk_ctx["flights"]:{
 
                     textToAppend = count.str + " ) " + flight["Flight"] + ", Leaving: " + flight["Departing"] + " on the " + flight["DateDeparting"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["Destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
                     count = count +1 ;
 
-                    visitor.response + textToAppend ;
+                    visitor.response.l::append(textToAppend);
                     textToAppend = "";
 
                 }
@@ -533,6 +608,7 @@ node nd_cancel_flight_co:dialogue_state {
 
         if(response["response"]):{
             flightstoCancell = response["response"]["flights"];
+            #std.out(flightstoCancell);
         }
         else:{
             flightstoCancell = "There are no flights to Cancell";
@@ -571,6 +647,7 @@ node nd_cancel_flight_co:dialogue_state {
         else:{
             if(visitor.wlk_ctx["intent"] in ["one", 'two',"three", "four"]):{
                 ::getInterger ;
+                ::getUsersFlight ;
                 visitor.flight = flightstoCancell[visitor.wlk_ctx["flight_chosen"]];
                 visitor.wlk_ctx["respond"] = true ;
                 
@@ -593,13 +670,13 @@ node nd_cancel_flight_co:dialogue_state {
     can nlg {
         if(visitor.wlk_ctx["prev_state"] != null):{
             if(visitor.wlk_ctx["prev_state"].name == "dialogue_root" or visitor.wlk_ctx["prev_state"].name == "cancelflight"):{
-                visitor.response = "Please select Flight to cancell: \n"  ;
+                visitor.response = ["Please select Flight to cancell:"]  ;
                  for flight in flightstoCancell:{
 
-                    textToAppend = count.str + " ) " + flight["flightName"] + ", Leaving: " + flight["origin"] + " on the " + flight["DateLeaving"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"] + "\n" ;
+                    textToAppend = count.str + " ) " + flight["flightName"] + ", Leaving: " + flight["origin"] + " on the " + flight["DateLeaving"] + " at " + flight["TimeLeaving"]+ " and arriving in " + flight["destination"] + " on the " + flight["DateArriving"] + " at " + flight["TimeArriving"];
                     count = count +1 ;
 
-                    visitor.response = visitor.response + textToAppend ;
+                    visitor.response.l::append(textToAppend) ;
                     textToAppend = "";
 
                 }
@@ -607,7 +684,7 @@ node nd_cancel_flight_co:dialogue_state {
         }
 
         elif(visitor.wlk_ctx["intent"] in ["one" ,"two","three", "four"]):{
-            visitor.response = "Is this flight the one you want to cancell? \n" + visitor.flight.str ;
+            visitor.response = "Is this flight the one you want to cancell?  " + visitor.flight["flightName"] + ", Leaving: " + visitor.flight["origin"] + " on the " + visitor.flight["DateLeaving"] + " at " + visitor.flight["TimeLeaving"]+ " and arriving in " + visitor.flight["destination"] + " on the " + visitor.flight["DateArriving"] + " at " + visitor.flight["TimeArriving"] ;
     }
 /*
     can getflights{
@@ -620,7 +697,19 @@ node nd_cancel_flight_co:dialogue_state {
 
 node nd_confirmCancellation:dialogue_state{
     has name = "cancelFlightConfirm";
+    has sucess = false ;
+can cancelflight{
+     response = request.post("http://localhost:8080/airline/cancelflight/",
+        {
+            "BookedFlightID" : visitor.flight["BookedFlightId"]
+        },
+        null
+        );
 
+        here.sucess = response["response"]["Sucess"];
+       
+    
+}
 
 can process {
 
@@ -629,6 +718,9 @@ can process {
             visitor.wlk_ctx["respond"] = true ;
 
             // ability to cancel flight
+            ::cancelflight ;
+            
+
         }
     }
 
@@ -642,7 +734,103 @@ can process {
 }
 
 can nlg {
-    visitor.response =  "This Flight has been cancelled \n" +  visitor.flight.str ;
+    if(sucess == true): visitor.response =  "This Flight has been cancelled: " +   visitor.flight["flightName"] + ", Leaving: " + visitor.flight["origin"] + " on the " + visitor.flight["DateLeaving"] + " at " + visitor.flight["TimeLeaving"]+ " and arriving in " + visitor.flight["destination"] + " on the " + visitor.flight["DateArriving"] + " at " + visitor.flight["TimeArriving"] ;
+    else : visitor.response = "There was a problem processig your request";
 }
     
 }
+
+
+//faq 
+
+
+// account nodes 
+/*
+node accountState{
+
+can nlu {
+    user_Id = -[user_transition]->.edge.id;
+    if(visitor.question in user_Id):{
+        visitor.wlk_ctx["userID"] = visitor.question ;
+    }
+}
+
+    can process {
+        if(visitor.account){
+            if(visitor.question = visitor.account.context["password"]){
+                visitor.access= true ;
+                visitor.wlk_ctx["next_state"] = net.root();
+            }
+            else: visitor.wlk_ctx["respond"] = true ;
+
+
+        }
+        else:{
+            if(visitor.wlk_ctx["userId"]):{
+            visitor.account = -[user_transition(id==question)]->[0];
+            if(!visitor.account):{
+                visitor.wlk_ctx["respond"] = true;
+            }
+        }
+
+             else : visitor.wlk_ctx["respond"] = true ;
+
+        }
+       
+
+    }
+}
+
+
+node user {
+    has password;
+}
+
+
+        response = "Please Enter User Id";
+         if(interactive): std.out(response);
+           else:{
+            yield report response ;
+           }
+
+        
+
+        if (account):{
+            response = "Please Enter Password";
+             if(interactive): std.out(response);
+           else{
+            yield report response ;
+
+        }
+
+        Password = question;
+        if(password==account.context["password"]):{
+            access = true;
+            response = "Access Granted";
+            if(interactive): std.out(response);
+           else:{
+            report response;
+            take net.root();     
+        }
+        }
+        else:{
+            response = "Wrong Password";
+            if(interactive): std.out(response);
+           else{
+            report response;
+            take net.root();
+        }
+
+    }
+        }
+    else :{
+         response = "No such account exits for that ID";
+             if(interactive): std.out(response);
+           else{
+            report response;
+            take net.root();
+
+    }
+}
+
+*/
